@@ -8,14 +8,34 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useGame } from '@/context/game-context';
+import { CustomAlert, AlertButton } from '@/components/custom-alert';
 
 export default function PlayersScreen() {
   const { namePool, selectedPlayers, addToPool, removeFromPool, toggleSelect } = useGame();
   const [newName, setNewName] = useState('');
+  
+  const [alertConfig, setAlertConfig] = useState<{
+    visible: boolean;
+    title: string;
+    message: string;
+    buttons: AlertButton[];
+  }>({ visible: false, title: '', message: '', buttons: [] });
+
+  const showAlert = (title: string, message: string, buttons?: AlertButton[]) => {
+    setAlertConfig({
+      visible: true,
+      title,
+      message,
+      buttons: buttons || [{ text: 'OK', style: 'default', onPress: closeAlert }]
+    });
+  };
+
+  const closeAlert = () => setAlertConfig(prev => ({ ...prev, visible: false }));
+
 
   const handleAdd = () => {
     const trimmed = newName.trim();
@@ -24,12 +44,12 @@ export default function PlayersScreen() {
     if (success) {
       setNewName('');
     } else {
-      Alert.alert('Duplicate', `"${trimmed.toUpperCase()}" is already in the pool.`);
+      showAlert('Duplicate', `"${trimmed.toUpperCase()}" is already in the pool.`);
     }
   };
 
   const handleDelete = (name: string) => {
-    Alert.alert('Remove Player', `Remove "${name}" from the pool?`, [
+    showAlert('Remove Player', `Remove "${name}" from the pool?`, [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Remove', style: 'destructive', onPress: () => removeFromPool(name) },
     ]);
@@ -135,6 +155,7 @@ export default function PlayersScreen() {
         {/* Bottom hint */}
         {selectedPlayers.length > 0 && selectedPlayers.length < 4 && (
           <View style={styles.hint}>
+            <Ionicons name="information-circle" size={20} color="#E9C46A" style={styles.hintIcon} />
             <Text style={styles.hintText}>
               Select {4 - selectedPlayers.length} more player{4 - selectedPlayers.length !== 1 ? 's' : ''} to simulate a court
             </Text>
@@ -142,12 +163,14 @@ export default function PlayersScreen() {
         )}
         {selectedPlayers.length >= 4 && (
           <View style={styles.readyHint}>
+            <Ionicons name="checkmark-circle" size={20} color="#2A9D8F" style={styles.hintIcon} />
             <Text style={styles.readyHintText}>
               Ready! Go to the Courts tab to simulate
             </Text>
           </View>
         )}
       </KeyboardAvoidingView>
+      <CustomAlert {...alertConfig} onClose={closeAlert} />
     </SafeAreaView>
   );
 }
@@ -356,26 +379,37 @@ const styles = StyleSheet.create({
   },
   hint: {
     padding: 16,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: 'rgba(233,196,106,0.1)',
     borderTopWidth: 1,
     borderTopColor: 'rgba(233,196,106,0.2)',
+    gap: 8,
+  },
+  hintIcon: {
+    marginRight: 4,
   },
   hintText: {
     color: '#E9C46A',
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
   readyHint: {
     padding: 16,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: 'rgba(42,157,143,0.1)',
     borderTopWidth: 1,
     borderTopColor: 'rgba(42,157,143,0.2)',
+    gap: 8,
   },
   readyHintText: {
     color: '#2A9D8F',
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
 });

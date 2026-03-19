@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Phase = 'idle' | 'seeding' | 'result';
@@ -163,7 +164,10 @@ export default function CourtsScreen() {
           {/* Phase: idle */}
           {phase === 'idle' && !canSimulate && (
             <View style={styles.messageBox}>
-              <Text style={styles.messageIcon}>🏓</Text>
+              <View style={styles.messageIconContainer}>
+                <Ionicons name="alert-circle-outline" size={48} color="#E9C46A" />
+              </View>
+              <Text style={styles.messageTitle}>Not Ready Yet</Text>
               <Text style={styles.messageText}>
                 Select at least 4 players from the Players tab to simulate
                 courts.
@@ -197,7 +201,7 @@ export default function CourtsScreen() {
                     placeholderTextColor="#666"
                     keyboardType="number-pad"
                     value={seedValues[player] || ''}
-                    onChangeText={text =>
+                    onChangeText={(text: string) =>
                       setSeedValues(prev => ({ ...prev, [player]: text }))
                     }
                     maxLength={4}
@@ -375,20 +379,37 @@ const styles = StyleSheet.create({
     margin: 20,
     alignItems: 'center',
     padding: 32,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 16,
+    backgroundColor: 'rgba(233,196,106,0.05)',
+    borderRadius: 24,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: 'rgba(233,196,106,0.15)',
+    borderStyle: 'dashed',
+  },
+  messageIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(233,196,106,0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
   },
   messageIcon: {
     fontSize: 48,
     marginBottom: 12,
   },
+  messageTitle: {
+    color: '#E9C46A',
+    fontSize: 20,
+    fontWeight: '800',
+    marginBottom: 8,
+  },
   messageText: {
-    color: 'rgba(255,255,255,0.5)',
+    color: 'rgba(255,255,255,0.6)',
     fontSize: 15,
     textAlign: 'center',
     lineHeight: 22,
+    maxWidth: 240,
   },
   simulateBtn: {
     marginHorizontal: 20,
