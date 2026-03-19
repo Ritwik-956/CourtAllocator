@@ -1,4 +1,5 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /**
  * Represents a single game court with two teams.
@@ -35,6 +36,7 @@ type GameContextType = {
 const GameContext = createContext<GameContextType | null>(null);
 
 const INITIAL_POOL = ['RITWIK', 'GAURI', 'PRACHEE', 'MONIT'];
+const PLAYERS_STORAGE_KEY = '@namePool';
 
 /**
  * Creates a seeded random number generator based on the provided seeds.
@@ -214,6 +216,33 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const [winners, setWinners] = useState<Record<number, 1 | 2>>({}); // Map of court ID to winning team index
   const [winStreaks, setWinStreaks] = useState<Record<string, number>>({}); // Track consecutive wins per player
   const [sitOutCount, setSitOutCount] = useState<Record<string, number>>({}); // Track how many rounds a player has sat out
+  const [isLoaded, setIsLoaded] = useState(false); // Track if AsyncStorage has been loaded
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const stored = await AsyncStorage.getItem(PLAYERS_STORAGE_KEY);
+        if (stored) {
+          setNamePool(JSON.parse(stored));
+        }
+      } catch (err) {
+        console.error('Failed to load initial pool:', err);
+      } finally {
+        setIsLoaded(true);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    (async () => {
+      try {
+        await AsyncStorage.setItem(PLAYERS_STORAGE_KEY, JSON.stringify(namePool));
+      } catch (err) {
+        console.error('Failed to save name pool:', err);
+      }
+    })();
+  }, [namePool, isLoaded]);
 
   const addToPool = useCallback(
     (name: string): boolean => {
