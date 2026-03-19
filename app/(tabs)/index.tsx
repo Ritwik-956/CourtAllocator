@@ -118,6 +118,18 @@ export default function PlayersScreen() {
               <Text style={styles.emptySubtext}>Add players above to get started!</Text>
             </View>
           }
+          ListFooterComponent={
+            <View style={styles.instructionContainer}>
+              <Text style={styles.instructionTitle}>How It Works</Text>
+              <View style={styles.instructionList}>
+                <Text style={styles.instructionText}>• Select ≥4 players for courts; extras sit out.</Text>
+                <Text style={styles.instructionText}>• Players are randomly paired into teams.</Text>
+                <Text style={styles.instructionText}>• Winning teams stay together (split after 3 wins).</Text>
+                <Text style={styles.instructionText}>• Players sitting out get priority next round.</Text>
+                <Text style={styles.instructionText}>• Winners play winners or top challengers.</Text>
+              </View>
+            </View>
+          }
         />
 
         {/* Bottom hint */}
@@ -320,6 +332,27 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.25)',
     fontSize: 14,
     marginTop: 4,
+  },
+  instructionContainer: {
+    marginTop: 20,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.08)',
+  },
+  instructionTitle: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 8,
+    letterSpacing: 0.5,
+  },
+  instructionList: {
+    gap: 6,
+  },
+  instructionText: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 13,
+    lineHeight: 18,
   },
   hint: {
     padding: 16,
