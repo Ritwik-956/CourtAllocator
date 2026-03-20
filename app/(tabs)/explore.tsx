@@ -10,6 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -30,6 +31,10 @@ export default function CourtsScreen() {
     resetSimulation,
     getPlayersForSeeding,
   } = useGame();
+
+  const { width } = useWindowDimensions();
+  const isWide = width > 768;
+  const isTablet = width > 600;
 
   const [phase, setPhase] = useState<Phase>('idle');
   const [seedPlayers, setSeedPlayers] = useState<string[]>([]);
@@ -88,6 +93,7 @@ export default function CourtsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={[styles.mainWrapper, isWide && styles.wideWrapper]}>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -192,12 +198,13 @@ export default function CourtsScreen() {
                 To increase randomness, ask these players to pick a number!
               </Text>
 
+              <View style={isTablet && styles.seedingGrid}>
               {seedPlayers.map(player => (
-                <View key={player} style={styles.seedRow}>
-                  <Text style={styles.seedLabel}>{player}</Text>
+                <View key={player} style={[styles.seedRow, isTablet && styles.seedRowGrid]}>
+                  <Text style={styles.seedLabel} numberOfLines={1}>{player}</Text>
                   <TextInput
                     style={styles.seedInput}
-                    placeholder="1 – 999"
+                    placeholder="1–999"
                     placeholderTextColor="#666"
                     keyboardType="number-pad"
                     value={seedValues[player] || ''}
@@ -208,6 +215,7 @@ export default function CourtsScreen() {
                   />
                 </View>
               ))}
+              </View>
 
               <TouchableOpacity
                 style={[styles.goBtn, !allSeedsFilled && styles.goBtnDisabled]}
@@ -222,9 +230,13 @@ export default function CourtsScreen() {
           {/* Phase: result */}
           {phase === 'result' && (
             <View style={styles.resultSection}>
-              {courts.map(court => (
-                <CourtView key={court.id} court={court} />
-              ))}
+              <View style={isTablet && styles.courtGrid}>
+                {courts.map(court => (
+                  <View key={court.id} style={isTablet && styles.courtItem}>
+                    <CourtView court={court} />
+                  </View>
+                ))}
+              </View>
 
               {excludedPlayers.length > 0 && (
                 <View style={styles.excludedBox}>
@@ -265,6 +277,7 @@ export default function CourtsScreen() {
           )}
         </ScrollView>
       </KeyboardAvoidingView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -274,6 +287,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F1A2E',
+    alignItems: 'center',
+  },
+  mainWrapper: {
+    flex: 1,
+    width: '100%',
+  },
+  wideWrapper: {
+    maxWidth: 1000,
   },
   scrollContent: {
     paddingBottom: 40,
@@ -444,17 +465,27 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     lineHeight: 18,
   },
+  seedingGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
   seedRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 14,
   },
+  seedRowGrid: {
+    width: '48%',
+    marginBottom: 8,
+  },
   seedLabel: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
     flex: 1,
+    marginRight: 8,
   },
   seedInput: {
     width: 100,
@@ -488,6 +519,15 @@ const styles = StyleSheet.create({
   resultSection: {
     paddingHorizontal: 20,
     paddingTop: 8,
+  },
+  courtGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  courtItem: {
+    width: '48%',
+    marginBottom: 10,
   },
   excludedBox: {
     backgroundColor: 'rgba(233,196,106,0.1)',

@@ -3,12 +3,13 @@
     "name": "CourtAllocator",
     "slug": "CourtAllocator",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "courtallocator",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.grmpar.courtallocator"
     },
     "android": {
       "adaptiveIcon": {
@@ -16,7 +17,7 @@
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "package": "com.anonymous.courtallocator"
+      "package": "com.grmpar.courtallocator"
     },
     "web": {
       "output": "static",
@@ -28,7 +29,7 @@
         {
           "image": "./assets/images/splash-icon.png",
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#0F1A2E",
           "dark": {
             "backgroundColor": "#0F1A2E"
           }

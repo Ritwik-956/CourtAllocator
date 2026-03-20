@@ -8,6 +8,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +16,10 @@ import { useGame } from '@/context/game-context';
 import { CustomAlert, AlertButton } from '@/components/custom-alert';
 
 export default function PlayersScreen() {
+  const { width } = useWindowDimensions();
+  const isTablet = width > 768;
+  const numColumns = width > 1024 ? 3 : width > 600 ? 2 : 1;
+
   const { namePool, selectedPlayers, addToPool, removeFromPool, toggleSelect } = useGame();
   const [newName, setNewName] = useState('');
   
@@ -59,6 +64,7 @@ export default function PlayersScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={[styles.mainWrapper, isTablet && styles.tabletWrapper]}>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -102,9 +108,12 @@ export default function PlayersScreen() {
 
         {/* Name Pool List */}
         <FlatList
+          key={`list-${numColumns}`}
           data={namePool}
+          numColumns={numColumns}
           keyExtractor={(item) => item}
           contentContainerStyle={styles.listContent}
+          columnWrapperStyle={numColumns > 1 ? styles.columnWrapper : undefined}
           renderItem={({ item }) => {
             const selected = isSelected(item);
             return (
@@ -141,12 +150,12 @@ export default function PlayersScreen() {
           ListFooterComponent={
             <View style={styles.instructionContainer}>
               <Text style={styles.instructionTitle}>How It Works</Text>
-              <View style={styles.instructionList}>
-                <Text style={styles.instructionText}>• Select ≥4 players for courts; extras sit out.</Text>
-                <Text style={styles.instructionText}>• Players are randomly paired into teams.</Text>
-                <Text style={styles.instructionText}>• Winning teams stay together (split after 3 wins).</Text>
-                <Text style={styles.instructionText}>• Players sitting out get priority next round.</Text>
-                <Text style={styles.instructionText}>• Winners play winners or top challengers.</Text>
+              <View style={[styles.instructionList, isTablet && styles.instructionListTablet]}>
+                <Text style={[styles.instructionText, isTablet && styles.instructionTextTablet]}>• Select ≥4 players for courts; extras sit out.</Text>
+                <Text style={[styles.instructionText, isTablet && styles.instructionTextTablet]}>• Players are randomly paired into teams.</Text>
+                <Text style={[styles.instructionText, isTablet && styles.instructionTextTablet]}>• Winning teams stay together (split after 3 wins).</Text>
+                <Text style={[styles.instructionText, isTablet && styles.instructionTextTablet]}>• Players sitting out get priority next round.</Text>
+                <Text style={[styles.instructionText, isTablet && styles.instructionTextTablet]}>• Winners play winners or top challengers.</Text>
               </View>
             </View>
           }
@@ -170,6 +179,7 @@ export default function PlayersScreen() {
           </View>
         )}
       </KeyboardAvoidingView>
+      </View>
       <CustomAlert {...alertConfig} onClose={closeAlert} />
     </SafeAreaView>
   );
@@ -180,6 +190,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F1A2E',
+    alignItems: 'center',
+  },
+  mainWrapper: {
+    flex: 1,
+    width: '100%',
+  },
+  tabletWrapper: {
+    maxWidth: 1000,
   },
   header: {
     paddingHorizontal: 20,
@@ -259,7 +277,11 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     gap: 8,
   },
+  columnWrapper: {
+    gap: 8,
+  },
   playerCard: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -372,10 +394,18 @@ const styles = StyleSheet.create({
   instructionList: {
     gap: 6,
   },
+  instructionListTablet: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
   instructionText: {
     color: 'rgba(255,255,255,0.4)',
     fontSize: 13,
     lineHeight: 18,
+  },
+  instructionTextTablet: {
+    width: '48%',
   },
   hint: {
     padding: 16,
