@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useGame, type Court } from '@/context/game-context';
+import { useThemeColor } from '@/hooks/use-theme-color';
 
 const COURT_GREEN = '#2D6A4F';
 const KITCHEN_GREEN = '#40916C';
@@ -10,11 +11,12 @@ const TEAM_B_COLOR = '#264653';
 export function CourtView({ court }: { court: Court }) {
   const { winners, setWinner } = useGame();
   const winner = winners[court.id];
+  const theme = useThemeColor();
 
   return (
     <View style={styles.wrapper}>
-      <Text style={styles.courtLabel}>Court {court.id}</Text>
-      <View style={styles.court}>
+      <Text style={[styles.courtLabel, { color: theme.text }]}>Court {court.id}</Text>
+      <View style={[styles.court, { borderColor: theme.textInverse }]}>
         {/* Team A side */}
         <View style={styles.teamSide}>
           <View style={styles.backCourt}>
@@ -32,9 +34,9 @@ export function CourtView({ court }: { court: Court }) {
 
         {/* Net */}
         <View style={styles.net}>
-          <View style={styles.netLine} />
-          <Text style={styles.netText}>NET</Text>
-          <View style={styles.netLine} />
+          <View style={[styles.netLine, { backgroundColor: theme.textInverse }]} />
+          <Text style={[styles.netText, { color: theme.textInverse }]}>NET</Text>
+          <View style={[styles.netLine, { backgroundColor: theme.textInverse }]} />
         </View>
 
         {/* Team B side */}
@@ -57,27 +59,33 @@ export function CourtView({ court }: { court: Court }) {
       <View style={styles.teamLabels}>
         <View style={styles.teamLabelRow}>
           <View style={[styles.teamDot, { backgroundColor: TEAM_A_COLOR }]} />
-          <Text style={styles.teamLabelText}>
+          <Text style={[styles.teamLabelText, { color: theme.textSecondary }]}>
             Team A: {court.team1[0]} & {court.team1[1]}
           </Text>
           {winner === 1 ? (
             <Text style={styles.winnerBadge}>👑 WINNER</Text>
           ) : (
-            <TouchableOpacity style={styles.selectBtn} onPress={() => setWinner(court.id, 1)}>
-              <Text style={styles.selectBtnText}>Select Winner</Text>
+            <TouchableOpacity 
+              style={[styles.selectBtn, { backgroundColor: theme.overlayLow, borderColor: theme.overlayHigh }]} 
+              onPress={() => setWinner(court.id, 1)}
+            >
+              <Text style={[styles.selectBtnText, { color: theme.textSecondary }]}>Select Winner</Text>
             </TouchableOpacity>
           )}
         </View>
         <View style={styles.teamLabelRow}>
           <View style={[styles.teamDot, { backgroundColor: TEAM_B_COLOR }]} />
-          <Text style={styles.teamLabelText}>
+          <Text style={[styles.teamLabelText, { color: theme.textSecondary }]}>
             Team B: {court.team2[0]} & {court.team2[1]}
           </Text>
           {winner === 2 ? (
             <Text style={styles.winnerBadge}>👑 WINNER</Text>
           ) : (
-            <TouchableOpacity style={styles.selectBtn} onPress={() => setWinner(court.id, 2)}>
-              <Text style={styles.selectBtnText}>Select Winner</Text>
+            <TouchableOpacity 
+              style={[styles.selectBtn, { backgroundColor: theme.overlayLow, borderColor: theme.overlayHigh }]} 
+              onPress={() => setWinner(court.id, 2)}
+            >
+              <Text style={[styles.selectBtnText, { color: theme.textSecondary }]}>Select Winner</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -94,7 +102,6 @@ const styles = StyleSheet.create({
   courtLabel: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#fff',
     marginBottom: 8,
     letterSpacing: 1,
   },
@@ -104,7 +111,6 @@ const styles = StyleSheet.create({
     backgroundColor: COURT_GREEN,
     borderRadius: 12,
     borderWidth: 3,
-    borderColor: '#fff',
     overflow: 'hidden',
   },
   teamSide: {
@@ -142,10 +148,8 @@ const styles = StyleSheet.create({
   netLine: {
     flex: 1,
     height: 2,
-    backgroundColor: '#fff',
   },
   netText: {
-    color: '#fff',
     fontSize: 11,
     fontWeight: '800',
     marginHorizontal: 8,
@@ -181,21 +185,17 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   teamLabelText: {
-    color: 'rgba(255,255,255,0.8)',
     fontSize: 13,
     fontWeight: '500',
   },
   selectBtn: {
     marginLeft: 'auto',
-    backgroundColor: 'rgba(255,255,255,0.1)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
   },
   selectBtnText: {
-    color: '#fff',
     fontSize: 12,
     fontWeight: '600',
   },

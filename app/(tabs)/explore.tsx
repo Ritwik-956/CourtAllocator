@@ -14,10 +14,12 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useThemeColor } from '@/hooks/use-theme-color';
 
 type Phase = 'idle' | 'seeding' | 'result';
 
 export default function CourtsScreen() {
+  const theme = useThemeColor();
   const {
     selectedPlayers,
     courts,
@@ -92,7 +94,7 @@ export default function CourtsScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
       <View style={[styles.mainWrapper, isWide && styles.wideWrapper]}>
       <KeyboardAvoidingView
         style={styles.flex}
@@ -101,37 +103,39 @@ export default function CourtsScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Courts</Text>
-            <Text style={styles.subtitle}>
+            <Text style={[styles.title, { color: theme.text }]}>Courts</Text>
+            <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
               Simulate random court allocations
             </Text>
           </View>
 
           {/* Status */}
-          <View style={styles.statusCard}>
+          <View style={[styles.statusCard, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
             <View style={styles.statusRow}>
-              <Text style={styles.statusLabel}>Selected Players</Text>
-              <Text style={styles.statusValue}>{selectedPlayers.length}</Text>
+              <Text style={[styles.statusLabel, { color: theme.textSecondary }]}>Selected Players</Text>
+              <Text style={[styles.statusValue, { color: theme.text }]}>{selectedPlayers.length}</Text>
             </View>
             <View style={styles.statusRow}>
-              <Text style={styles.statusLabel}>Courts to Use</Text>
+              <Text style={[styles.statusLabel, { color: theme.textSecondary }]}>Courts to Use</Text>
               <View style={styles.counterRow}>
                 <TouchableOpacity
                   style={[
                     styles.countBtn,
+                    { backgroundColor: theme.overlayLow, borderColor: theme.overlayHigh },
                     courtCount <= 0 && styles.countBtnDisabled,
                   ]}
                   onPress={() => setCourtCount(Math.max(0, courtCount - 1))}
                   disabled={courtCount <= 0}
                 >
-                  <Text style={styles.countBtnText}>−</Text>
+                  <Text style={[styles.countBtnText, { color: theme.text }]}>−</Text>
                 </TouchableOpacity>
                 <View style={styles.countDisplay}>
-                  <Text style={styles.statusValue}>{courtCount}</Text>
+                  <Text style={[styles.statusValue, { color: theme.text }]}>{courtCount}</Text>
                 </View>
                 <TouchableOpacity
                   style={[
                     styles.countBtn,
+                    { backgroundColor: theme.overlayLow, borderColor: theme.overlayHigh },
                     courtCount >= maxCourts && styles.countBtnDisabled,
                   ]}
                   onPress={() =>
@@ -139,14 +143,14 @@ export default function CourtsScreen() {
                   }
                   disabled={courtCount >= maxCourts}
                 >
-                  <Text style={styles.countBtnText}>+</Text>
+                  <Text style={[styles.countBtnText, { color: theme.text }]}>+</Text>
                 </TouchableOpacity>
               </View>
             </View>
             {selectedPlayers.length - courtCount * 4 > 0 && courtCount >= 0 && (
               <View style={styles.statusRow}>
-                <Text style={styles.statusLabel}>Will Sit Out</Text>
-                <Text style={[styles.statusValue, { color: '#E9C46A' }]}>
+                <Text style={[styles.statusLabel, { color: theme.textSecondary }]}>Will Sit Out</Text>
+                <Text style={[styles.statusValue, { color: theme.accent }]}>
                   {selectedPlayers.length - courtCount * 4}
                 </Text>
               </View>
@@ -156,11 +160,11 @@ export default function CourtsScreen() {
           {/* Selected players list */}
           {selectedPlayers.length > 0 && (
             <View style={styles.selectedList}>
-              <Text style={styles.sectionTitle}>Selected</Text>
+              <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>Selected</Text>
               <View style={styles.chipRow}>
                 {selectedPlayers.map(name => (
-                  <View key={name} style={styles.chip}>
-                    <Text style={styles.chipText}>{name}</Text>
+                  <View key={name} style={[styles.chip, { backgroundColor: `${theme.primary}20`, borderColor: `${theme.primary}40` }]}>
+                    <Text style={[styles.chipText, { color: theme.primary }]}>{name}</Text>
                   </View>
                 ))}
               </View>
@@ -169,12 +173,12 @@ export default function CourtsScreen() {
 
           {/* Phase: idle */}
           {phase === 'idle' && !canSimulate && (
-            <View style={styles.messageBox}>
-              <View style={styles.messageIconContainer}>
-                <Ionicons name="alert-circle-outline" size={48} color="#E9C46A" />
+            <View style={[styles.messageBox, { backgroundColor: `${theme.accent}05`, borderColor: `${theme.accent}20` }]}>
+              <View style={[styles.messageIconContainer, { backgroundColor: `${theme.accent}15` }]}>
+                <Ionicons name="alert-circle-outline" size={48} color={theme.accent} />
               </View>
-              <Text style={styles.messageTitle}>Not Ready Yet</Text>
-              <Text style={styles.messageText}>
+              <Text style={[styles.messageTitle, { color: theme.accent }]}>Not Ready Yet</Text>
+              <Text style={[styles.messageText, { color: theme.textSecondary }]}>
                 Select at least 4 players from the Players tab to simulate
                 courts.
               </Text>
@@ -183,29 +187,33 @@ export default function CourtsScreen() {
 
           {phase === 'idle' && canSimulate && (
             <TouchableOpacity
-              style={styles.simulateBtn}
+              style={[styles.simulateBtn, { backgroundColor: theme.primary }]}
               onPress={handleStartSimulation}
             >
-              <Text style={styles.simulateBtnText}>Simulate Courts</Text>
+              <Text style={[styles.simulateBtnText, { color: '#fff' }]}>Simulate Courts</Text>
             </TouchableOpacity>
           )}
 
           {/* Phase: seeding */}
           {phase === 'seeding' && (
-            <View style={styles.seedingSection}>
-              <Text style={styles.seedingTitle}>Enter Random Numbers</Text>
-              <Text style={styles.seedingSubtitle}>
+            <View style={[styles.seedingSection, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
+              <Text style={[styles.seedingTitle, { color: theme.accent }]}>Enter Random Numbers</Text>
+              <Text style={[styles.seedingSubtitle, { color: theme.textSecondary }]}>
                 To increase randomness, ask these players to pick a number!
               </Text>
 
               <View style={isTablet && styles.seedingGrid}>
               {seedPlayers.map(player => (
                 <View key={player} style={[styles.seedRow, isTablet && styles.seedRowGrid]}>
-                  <Text style={styles.seedLabel} numberOfLines={1}>{player}</Text>
+                  <Text style={[styles.seedLabel, { color: theme.text }]} numberOfLines={1}>{player}</Text>
                   <TextInput
-                    style={styles.seedInput}
+                    style={[styles.seedInput, { 
+                      backgroundColor: theme.inputBackground, 
+                      borderColor: theme.inputBorder,
+                      color: theme.text
+                    }]}
                     placeholder="1–999"
-                    placeholderTextColor="#666"
+                    placeholderTextColor={theme.textSecondary}
                     keyboardType="number-pad"
                     value={seedValues[player] || ''}
                     onChangeText={(text: string) =>
@@ -218,11 +226,11 @@ export default function CourtsScreen() {
               </View>
 
               <TouchableOpacity
-                style={[styles.goBtn, !allSeedsFilled && styles.goBtnDisabled]}
+                style={[styles.goBtn, !allSeedsFilled && styles.goBtnDisabled, { backgroundColor: theme.primary }]}
                 onPress={handleRunSimulation}
                 disabled={!allSeedsFilled}
               >
-                <Text style={styles.goBtnText}>Shuffle & Allocate!</Text>
+                <Text style={[styles.goBtnText, { color: '#fff' }]}>Shuffle & Allocate!</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -239,14 +247,14 @@ export default function CourtsScreen() {
               </View>
 
               {excludedPlayers.length > 0 && (
-                <View style={styles.excludedBox}>
-                  <Text style={styles.excludedTitle}>
+                <View style={[styles.excludedBox, { backgroundColor: `${theme.accent}10`, borderColor: `${theme.accent}20` }]}>
+                  <Text style={[styles.excludedTitle, { color: theme.accent }]}>
                     Sitting Out This Round
                   </Text>
                   <View style={styles.chipRow}>
                     {excludedPlayers.map(name => (
-                      <View key={name} style={styles.excludedChip}>
-                        <Text style={styles.excludedChipText}>{name}</Text>
+                      <View key={name} style={[styles.excludedChip, { backgroundColor: `${theme.accent}15`, borderColor: `${theme.accent}30` }]}>
+                        <Text style={[styles.excludedChipText, { color: theme.accent }]}>{name}</Text>
                       </View>
                     ))}
                   </View>
@@ -255,23 +263,23 @@ export default function CourtsScreen() {
 
               <View style={styles.actionRow}>
                 <TouchableOpacity
-                  style={[styles.nextRoundBtn, !allWinnersSelected && styles.nextRoundBtnDisabled]}
+                  style={[styles.nextRoundBtn, !allWinnersSelected && styles.nextRoundBtnDisabled, { backgroundColor: theme.primary }]}
                   onPress={handleStartNextRound}
                   disabled={!allWinnersSelected}
                 >
-                  <Text style={styles.nextRoundBtnText}>Simulate Next Round</Text>
+                  <Text style={[styles.nextRoundBtnText, { color: '#fff' }]}>Simulate Next Round</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={styles.reshuffleBtnHalf}
+                  style={[styles.reshuffleBtnHalf, { backgroundColor: theme.accent }]}
                   onPress={handleStartSimulation}
                 >
-                  <Text style={styles.reshuffleBtnText}>Re-Shuffle All</Text>
+                  <Text style={[styles.reshuffleBtnText, { color: '#fff' }]}>Re-Shuffle All</Text>
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity style={styles.resetBtn} onPress={handleReset}>
-                <Text style={styles.resetBtnText}>Reset</Text>
+              <TouchableOpacity style={[styles.resetBtn, { backgroundColor: theme.overlayLow, borderColor: theme.overlayHigh }]} onPress={handleReset}>
+                <Text style={[styles.resetBtnText, { color: theme.textSecondary }]}>Reset</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -286,7 +294,6 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   container: {
     flex: 1,
-    backgroundColor: '#0F1A2E',
     alignItems: 'center',
   },
   mainWrapper: {
@@ -307,22 +314,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#fff',
     letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
     marginTop: 2,
   },
   statusCard: {
     margin: 20,
-    backgroundColor: 'rgba(255,255,255,0.06)',
     borderRadius: 16,
     padding: 16,
     gap: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
   },
   statusRow: {
     flexDirection: 'row',
@@ -330,12 +333,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statusLabel: {
-    color: 'rgba(255,255,255,0.5)',
     fontSize: 14,
     fontWeight: '500',
   },
   statusValue: {
-    color: '#fff',
     fontSize: 18,
     fontWeight: '700',
   },
@@ -348,17 +349,14 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
   },
   countBtnDisabled: {
     opacity: 0.3,
   },
   countBtnText: {
-    color: '#fff',
     fontSize: 18,
     fontWeight: '600',
   },
@@ -371,7 +369,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    color: 'rgba(255,255,255,0.5)',
     fontSize: 13,
     fontWeight: '600',
     marginBottom: 8,
@@ -384,15 +381,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    backgroundColor: 'rgba(42,157,143,0.2)',
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(42,157,143,0.4)',
   },
   chipText: {
-    color: '#2A9D8F',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -400,33 +394,24 @@ const styles = StyleSheet.create({
     margin: 20,
     alignItems: 'center',
     padding: 32,
-    backgroundColor: 'rgba(233,196,106,0.05)',
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: 'rgba(233,196,106,0.15)',
     borderStyle: 'dashed',
   },
   messageIconContainer: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: 'rgba(233,196,106,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
   },
-  messageIcon: {
-    fontSize: 48,
-    marginBottom: 12,
-  },
   messageTitle: {
-    color: '#E9C46A',
     fontSize: 20,
     fontWeight: '800',
     marginBottom: 8,
   },
   messageText: {
-    color: 'rgba(255,255,255,0.6)',
     fontSize: 15,
     textAlign: 'center',
     lineHeight: 22,
@@ -434,33 +419,27 @@ const styles = StyleSheet.create({
   },
   simulateBtn: {
     marginHorizontal: 20,
-    backgroundColor: '#E9C46A',
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
   },
   simulateBtnText: {
-    color: '#0F1A2E',
     fontSize: 18,
     fontWeight: '800',
     letterSpacing: 0.5,
   },
   seedingSection: {
     margin: 20,
-    backgroundColor: 'rgba(255,255,255,0.06)',
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
   },
   seedingTitle: {
-    color: '#E9C46A',
     fontSize: 20,
     fontWeight: '700',
     marginBottom: 4,
   },
   seedingSubtitle: {
-    color: 'rgba(255,255,255,0.5)',
     fontSize: 13,
     marginBottom: 20,
     lineHeight: 18,
@@ -481,7 +460,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   seedLabel: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
     flex: 1,
@@ -489,19 +467,15 @@ const styles = StyleSheet.create({
   },
   seedInput: {
     width: 100,
-    backgroundColor: 'rgba(255,255,255,0.08)',
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
     textAlign: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
   },
   goBtn: {
-    backgroundColor: '#2A9D8F',
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
@@ -511,7 +485,6 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   goBtnText: {
-    color: '#fff',
     fontSize: 17,
     fontWeight: '800',
     letterSpacing: 0.5,
@@ -530,29 +503,23 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   excludedBox: {
-    backgroundColor: 'rgba(233,196,106,0.1)',
     borderRadius: 14,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: 'rgba(233,196,106,0.2)',
   },
   excludedTitle: {
-    color: '#E9C46A',
     fontSize: 15,
     fontWeight: '700',
     marginBottom: 10,
   },
   excludedChip: {
-    backgroundColor: 'rgba(233,196,106,0.15)',
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(233,196,106,0.3)',
   },
   excludedChipText: {
-    color: '#E9C46A',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -563,7 +530,6 @@ const styles = StyleSheet.create({
   },
   nextRoundBtn: {
     flex: 2,
-    backgroundColor: '#2A9D8F',
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
@@ -573,33 +539,27 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   nextRoundBtnText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '800',
   },
   reshuffleBtnHalf: {
     flex: 1,
-    backgroundColor: '#E9C46A',
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   reshuffleBtnText: {
-    color: '#0F1A2E',
     fontSize: 15,
     fontWeight: '800',
   },
   resetBtn: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
   },
   resetBtnText: {
-    color: 'rgba(255,255,255,0.6)',
     fontSize: 16,
     fontWeight: '600',
   },

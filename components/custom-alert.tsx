@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
 } from 'react-native';
+import { useThemeColor } from '@/hooks/use-theme-color';
 
 export interface AlertButton {
   text: string;
@@ -29,7 +30,11 @@ export function CustomAlert({
   buttons,
   onClose,
 }: CustomAlertProps) {
+  const theme = useThemeColor();
   if (!visible) return null;
+
+  // Manual dark/light override for the card background to be more specific than theme.card
+  const cardBg = theme.background === '#0F1A2E' ? '#162440' : '#FFFFFF';
 
   return (
     <Modal
@@ -41,15 +46,15 @@ export function CustomAlert({
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
-            <View style={styles.alertBox}>
-              <View style={styles.iconContainer}>
-                <Text style={styles.iconText}>
+            <View style={[styles.alertBox, { backgroundColor: cardBg, borderColor: theme.cardBorder }]}>
+              <View style={[styles.iconContainer, { backgroundColor: `${theme.accent}15`, borderColor: `${theme.accent}30` }]}>
+                <Text style={[styles.iconText, { color: theme.accent }]}>
                   {buttons.some(b => b.style === 'destructive') ? '!' : 'i'}
                 </Text>
               </View>
               
-              <Text style={styles.title}>{title}</Text>
-              <Text style={styles.message}>{message}</Text>
+              <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
+              <Text style={[styles.message, { color: theme.textSecondary }]}>{message}</Text>
               
               <View style={styles.buttonContainer}>
                 {buttons.map((btn, index) => {
@@ -61,8 +66,8 @@ export function CustomAlert({
                       key={index}
                       style={[
                         styles.button,
-                        isDestructive ? styles.buttonDestructive : 
-                        isCancel ? styles.buttonCancel : styles.buttonDefault,
+                        isDestructive ? { backgroundColor: `${theme.danger}15`, borderWidth: 1, borderColor: `${theme.danger}30` } : 
+                        isCancel ? { backgroundColor: theme.overlayLow } : { backgroundColor: theme.primary },
                         buttons.length === 2 && styles.buttonHalf
                       ]}
                       onPress={() => {
@@ -76,8 +81,8 @@ export function CustomAlert({
                       <Text
                         style={[
                           styles.buttonText,
-                          isDestructive ? styles.buttonTextDestructive :
-                          isCancel ? styles.buttonTextCancel : styles.buttonTextDefault
+                          isDestructive ? { color: theme.danger } :
+                          isCancel ? { color: theme.text } : { color: '#fff' }
                         ]}
                       >
                         {btn.text}
@@ -105,44 +110,37 @@ const styles = StyleSheet.create({
   alertBox: {
     width: '100%',
     maxWidth: 340,
-    backgroundColor: '#162440',
     borderRadius: 24,
     padding: 24,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
     elevation: 10,
+    borderWidth: 1,
   },
   iconContainer: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(233,196,106,0.15)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: 'rgba(233,196,106,0.3)',
   },
   iconText: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#E9C46A',
   },
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#fff',
     marginBottom: 8,
     textAlign: 'center',
   },
   message: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.7)',
     textAlign: 'center',
     marginBottom: 24,
     lineHeight: 22,
@@ -164,28 +162,8 @@ const styles = StyleSheet.create({
   buttonHalf: {
     flex: 1,
   },
-  buttonDefault: {
-    backgroundColor: '#2A9D8F',
-  },
-  buttonDestructive: {
-    backgroundColor: 'rgba(230,57,70,0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(230,57,70,0.3)',
-  },
-  buttonCancel: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
-  },
   buttonText: {
     fontSize: 16,
     fontWeight: '700',
-  },
-  buttonTextDefault: {
-    color: '#fff',
-  },
-  buttonTextDestructive: {
-    color: '#E63946',
-  },
-  buttonTextCancel: {
-    color: '#fff',
   },
 });
