@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "CourtAllocator",
-    "slug": "CourtAllocator",
-    "version": "1.0.0",
+    "name": "FairCourt",
+    "slug": "faircourt",
+    "version": "2.0.0",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
-    "scheme": "courtallocator",
+    "scheme": "faircourt",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,

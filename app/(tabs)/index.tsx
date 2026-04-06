@@ -12,9 +12,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useGame } from '@/context/game-context';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { useGame, Sport } from '@/context/game-context';
 import { CustomAlert, AlertButton } from '@/components/custom-alert';
 import { useThemeColor } from '@/hooks/use-theme-color';
+
+const SPORTS: { key: Sport; label: string; icon: string }[] = [
+  { key: 'pickleball', label: 'Pickleball', icon: 'table-tennis' },
+  { key: 'volleyball', label: 'Volleyball', icon: 'volleyball' },
+];
 
 export default function PlayersScreen() {
   const { width } = useWindowDimensions();
@@ -22,7 +28,7 @@ export default function PlayersScreen() {
   const numColumns = width > 1024 ? 3 : width > 600 ? 2 : 1;
   const theme = useThemeColor();
 
-  const { namePool, selectedPlayers, addToPool, removeFromPool, toggleSelect } = useGame();
+  const { namePool, selectedPlayers, addToPool, removeFromPool, toggleSelect, selectedSport, setSelectedSport, minPlayersPerCourt } = useGame();
   const [newName, setNewName] = useState('');
   
   const [alertConfig, setAlertConfig] = useState<{
@@ -72,8 +78,51 @@ export default function PlayersScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.title, { color: theme.text }]}>Court Allocator</Text>
+          <Text style={[styles.title, { color: theme.text }]}>FairCourt</Text>
           <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Manage your player pool</Text>
+        </View>
+
+        {/* Sport Selection */}
+        <View style={styles.sportSection}>
+          {SPORTS.map((sport) => {
+            const isActive = selectedSport === sport.key;
+            return (
+              <TouchableOpacity
+                key={sport.key}
+                activeOpacity={0.7}
+                onPress={() => setSelectedSport(sport.key)}
+                style={[
+                  styles.sportButton,
+                  {
+                    backgroundColor: isActive ? `${theme.primary}18` : theme.card,
+                    borderColor: isActive ? theme.primary : theme.cardBorder,
+                  },
+                ]}
+              >
+                <View style={[
+                  styles.sportIconWrap,
+                  { backgroundColor: isActive ? theme.primary : theme.overlayLow },
+                ]}>
+                  <MaterialCommunityIcons
+                    name={sport.icon as any}
+                    size={18}
+                    color={isActive ? '#fff' : theme.textSecondary}
+                  />
+                </View>
+                <Text style={[
+                  styles.sportLabel,
+                  { color: isActive ? theme.primary : theme.textSecondary },
+                ]}>
+                  {sport.label}
+                </Text>
+                {isActive && (
+                  <View style={[styles.sportCheck, { backgroundColor: theme.primary }]}>
+                    <Ionicons name="checkmark" size={12} color="#fff" />
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {/* Add Player Input */}
@@ -184,15 +233,15 @@ export default function PlayersScreen() {
         />
 
         {/* Bottom hint */}
-        {selectedPlayers.length > 0 && selectedPlayers.length < 4 && (
+        {selectedPlayers.length > 0 && selectedPlayers.length < minPlayersPerCourt && (
           <View style={[styles.hint, { backgroundColor: `${theme.accent}15`, borderTopColor: `${theme.accent}30` }]}>
             <Ionicons name="information-circle" size={20} color={theme.accent} style={styles.hintIcon} />
             <Text style={[styles.hintText, { color: theme.accent }]}>
-              Select {4 - selectedPlayers.length} more player{4 - selectedPlayers.length !== 1 ? 's' : ''} to simulate a court
+              Select {minPlayersPerCourt - selectedPlayers.length} more player{minPlayersPerCourt - selectedPlayers.length !== 1 ? 's' : ''} to simulate a court
             </Text>
           </View>
         )}
-        {selectedPlayers.length >= 4 && (
+        {selectedPlayers.length >= minPlayersPerCourt && (
           <View style={[styles.readyHint, { backgroundColor: `${theme.success}15`, borderTopColor: `${theme.success}30` }]}>
             <Ionicons name="checkmark-circle" size={20} color={theme.success} style={styles.hintIcon} />
             <Text style={[styles.readyHintText, { color: theme.success }]}>
@@ -233,6 +282,44 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     marginTop: 2,
+  },
+  sportSection: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 4,
+    gap: 10,
+  },
+  sportButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    gap: 8,
+  },
+  sportIconWrap: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sportLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+  sportCheck: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 2,
   },
   addSection: {
     flexDirection: 'row',

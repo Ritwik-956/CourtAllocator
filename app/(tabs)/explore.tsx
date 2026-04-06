@@ -1,5 +1,6 @@
 import { CourtView } from '@/components/court-view';
-import { useGame } from '@/context/game-context';
+import { VolleyballCourtView } from '@/components/volleyball-court-view';
+import { useGame, MAX_PLAYERS_PER_COURT } from '@/context/game-context';
 import React, { useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -32,6 +33,8 @@ export default function CourtsScreen() {
     winners,
     resetSimulation,
     getPlayersForSeeding,
+    minPlayersPerCourt,
+    selectedSport,
   } = useGame();
 
   const { width } = useWindowDimensions();
@@ -44,7 +47,7 @@ export default function CourtsScreen() {
   const [isNextRound, setIsNextRound] = useState(false);
 
   const canSimulate = courtCount >= 1;
-  const maxCourts = Math.floor(selectedPlayers.length / 4);
+  const maxCourts = Math.floor(selectedPlayers.length / minPlayersPerCourt);
   const allWinnersSelected = courts.length > 0 && courts.every(c => winners[c.id] !== undefined);
 
   useEffect(() => {
@@ -147,11 +150,12 @@ export default function CourtsScreen() {
                 </TouchableOpacity>
               </View>
             </View>
-            {selectedPlayers.length - courtCount * 4 > 0 && courtCount >= 0 && (
+            
+            {courtCount >= 1 && (
               <View style={styles.statusRow}>
                 <Text style={[styles.statusLabel, { color: theme.textSecondary }]}>Will Sit Out</Text>
                 <Text style={[styles.statusValue, { color: theme.accent }]}>
-                  {selectedPlayers.length - courtCount * 4}
+                  {Math.max(0, selectedPlayers.length - courtCount * MAX_PLAYERS_PER_COURT[selectedSport])}
                 </Text>
               </View>
             )}
@@ -179,7 +183,7 @@ export default function CourtsScreen() {
               </View>
               <Text style={[styles.messageTitle, { color: theme.accent }]}>Not Ready Yet</Text>
               <Text style={[styles.messageText, { color: theme.textSecondary }]}>
-                Select at least 4 players from the Players tab to simulate
+                Select at least {minPlayersPerCourt} players from the Players tab to simulate
                 courts.
               </Text>
             </View>
@@ -241,7 +245,11 @@ export default function CourtsScreen() {
               <View style={isTablet && styles.courtGrid}>
                 {courts.map(court => (
                   <View key={court.id} style={isTablet && styles.courtItem}>
-                    <CourtView court={court} />
+                    {selectedSport === 'volleyball' ? (
+                      <VolleyballCourtView court={court} />
+                    ) : (
+                      <CourtView court={court} />
+                    )}
                   </View>
                 ))}
               </View>

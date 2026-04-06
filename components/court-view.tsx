@@ -20,12 +20,11 @@ export function CourtView({ court }: { court: Court }) {
         {/* Team A side */}
         <View style={styles.teamSide}>
           <View style={styles.backCourt}>
-            <View style={[styles.playerBadge, { backgroundColor: TEAM_A_COLOR }]}>
-              <Text style={styles.playerName}>{court.team1[0]}</Text>
-            </View>
-            <View style={[styles.playerBadge, { backgroundColor: TEAM_A_COLOR }]}>
-              <Text style={styles.playerName}>{court.team1[1]}</Text>
-            </View>
+            {court.team1.map((p, i) => (
+              <View key={i} style={[styles.playerBadge, { backgroundColor: TEAM_A_COLOR }]}>
+                <Text style={styles.playerName}>{p}</Text>
+              </View>
+            ))}
           </View>
           <View style={styles.kitchen}>
             <Text style={styles.zoneText}>NVZ</Text>
@@ -45,12 +44,11 @@ export function CourtView({ court }: { court: Court }) {
             <Text style={styles.zoneText}>NVZ</Text>
           </View>
           <View style={styles.backCourt}>
-            <View style={[styles.playerBadge, { backgroundColor: TEAM_B_COLOR }]}>
-              <Text style={styles.playerName}>{court.team2[0]}</Text>
-            </View>
-            <View style={[styles.playerBadge, { backgroundColor: TEAM_B_COLOR }]}>
-              <Text style={styles.playerName}>{court.team2[1]}</Text>
-            </View>
+            {court.team2.map((p, i) => (
+              <View key={i} style={[styles.playerBadge, { backgroundColor: TEAM_B_COLOR }]}>
+                <Text style={styles.playerName}>{p}</Text>
+              </View>
+            ))}
           </View>
         </View>
       </View>
@@ -60,7 +58,7 @@ export function CourtView({ court }: { court: Court }) {
         <View style={styles.teamLabelRow}>
           <View style={[styles.teamDot, { backgroundColor: TEAM_A_COLOR }]} />
           <Text style={[styles.teamLabelText, { color: theme.textSecondary }]}>
-            Team A: {court.team1[0]} & {court.team1[1]}
+            Team A: {court.team1.join(' & ')}
           </Text>
           {winner === 1 ? (
             <Text style={styles.winnerBadge}>👑 WINNER</Text>
@@ -76,7 +74,7 @@ export function CourtView({ court }: { court: Court }) {
         <View style={styles.teamLabelRow}>
           <View style={[styles.teamDot, { backgroundColor: TEAM_B_COLOR }]} />
           <Text style={[styles.teamLabelText, { color: theme.textSecondary }]}>
-            Team B: {court.team2[0]} & {court.team2[1]}
+            Team B: {court.team2.join(' & ')}
           </Text>
           {winner === 2 ? (
             <Text style={styles.winnerBadge}>👑 WINNER</Text>
