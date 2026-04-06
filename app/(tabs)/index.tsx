@@ -140,6 +140,7 @@ export default function PlayersScreen() {
             onSubmitEditing={handleAdd}
             autoCapitalize="characters"
             returnKeyType="done"
+            maxLength={12}
           />
           <TouchableOpacity
             style={[styles.addButton, !newName.trim() && styles.addButtonDisabled, { backgroundColor: theme.primary }]}
@@ -222,8 +223,12 @@ export default function PlayersScreen() {
             <View style={[styles.instructionContainer, { borderTopColor: theme.cardBorder }]}>
               <Text style={[styles.instructionTitle, { color: theme.textSecondary }]}>How It Works</Text>
               <View style={[styles.instructionList, isTablet && styles.instructionListTablet]}>
-                <Text style={[styles.instructionText, isTablet && styles.instructionTextTablet, { color: theme.textSecondary }]}>• Select ≥4 players for courts; extras sit out.</Text>
-                <Text style={[styles.instructionText, isTablet && styles.instructionTextTablet, { color: theme.textSecondary }]}>• Players are randomly paired into teams.</Text>
+                <Text style={[styles.instructionText, isTablet && styles.instructionTextTablet, { color: theme.textSecondary }]}>• Select ≥{minPlayersPerCourt} players for courts; extras sit out.</Text>
+                <Text style={[styles.instructionText, isTablet && styles.instructionTextTablet, { color: theme.textSecondary }]}>
+                  {selectedSport === 'volleyball' 
+                    ? '• Teams consist of 4–6 players each side.' 
+                    : '• Players are randomly paired into teams.'}
+                </Text>
                 <Text style={[styles.instructionText, isTablet && styles.instructionTextTablet, { color: theme.textSecondary }]}>• Winning teams stay together (split after 3 wins).</Text>
                 <Text style={[styles.instructionText, isTablet && styles.instructionTextTablet, { color: theme.textSecondary }]}>• Players sitting out get priority next round.</Text>
                 <Text style={[styles.instructionText, isTablet && styles.instructionTextTablet, { color: theme.textSecondary }]}>• Winners play winners or top challengers.</Text>

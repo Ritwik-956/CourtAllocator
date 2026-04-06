@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { useGame, type Court } from '@/context/game-context';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
@@ -10,18 +10,35 @@ const TEAM_A_COLOR = '#E76F51';
 const TEAM_B_COLOR = '#264653';
 
 // Formations for 4, 5, 6 players per team side
+// 'top' here is defined as distance from the NET.
 const SIDE_FORMATIONS: Record<number, { left: string; top: string }[]> = {
   4: [
-    { left: '25%', top: '35%' }, { left: '75%', top: '35%' }, // Front row
-    { left: '25%', top: '75%' }, { left: '75%', top: '75%' }, // Back row
+    { left: '25%', top: '25%' }, { left: '75%', top: '25%' }, // Front row
+    { left: '25%', top: '70%' }, { left: '75%', top: '70%' }, // Back row
   ],
   5: [
-    { left: '20%', top: '35%' }, { left: '50%', top: '35%' }, { left: '80%', top: '35%' }, // Front row
-    { left: '30%', top: '75%' }, { left: '70%', top: '75%' }, // Back row
+    { left: '18%', top: '25%' }, { left: '50%', top: '25%' }, { left: '82%', top: '25%' }, // Front row
+    { left: '30%', top: '70%' }, { left: '70%', top: '70%' }, // Back row
   ],
   6: [
-    { left: '23%', top: '35%' }, { left: '50%', top: '35%' }, { left: '77%', top: '35%' }, // Front row
-    { left: '23%', top: '75%' }, { left: '50%', top: '75%' }, { left: '77%', top: '75%' }, // Back row
+    { left: '22%', top: '25%' }, { left: '50%', top: '25%' }, { left: '78%', top: '25%' }, // Front row
+    { left: '22%', top: '70%' }, { left: '50%', top: '70%' }, { left: '78%', top: '70%' }, // Back row
+  ]
+};
+
+// LANDSCAPE formations: 'left' here is defined as distance from the NET.
+const LANDSCAPE_SIDE_FORMATIONS: Record<number, { left: string; top: string }[]> = {
+  4: [
+    { left: '28%', top: '25%' }, { left: '28%', top: '75%' }, // Front row
+    { left: '72%', top: '25%' }, { left: '72%', top: '75%' }, // Back row
+  ],
+  5: [
+    { left: '28%', top: '20%' }, { left: '28%', top: '50%' }, { left: '28%', top: '80%' }, // Front row
+    { left: '72%', top: '30%' }, { left: '72%', top: '70%' }, // Back row
+  ],
+  6: [
+    { left: '28%', top: '22%' }, { left: '28%', top: '50%' }, { left: '28%', top: '78%' }, // Front row
+    { left: '72%', top: '22%' }, { left: '72%', top: '50%' }, { left: '72%', top: '78%' }, // Back row
   ]
 };
 
@@ -29,31 +46,61 @@ export function VolleyballCourtView({ court }: { court: Court }) {
   const { winners, setWinner } = useGame();
   const winner = winners[court.id];
   const theme = useThemeColor();
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
 
-  const renderTeamSide = (players: string[], color: string, isTop: boolean) => {
+  const renderTeamSide = (players: string[], color: string, isSideA: boolean) => {
     const count = players.length;
-    const formation = SIDE_FORMATIONS[count as keyof typeof SIDE_FORMATIONS] || SIDE_FORMATIONS[6];
-    
+    let formationTemplate = isLandscape 
+      ? LANDSCAPE_SIDE_FORMATIONS[count] || LANDSCAPE_SIDE_FORMATIONS[6]
+      : SIDE_FORMATIONS[count] || SIDE_FORMATIONS[6];
+
     return (
-      <View style={[styles.teamSide, isTop ? styles.topSide : styles.bottomSide]}>
+      <View style={[
+        styles.teamSide, 
+        isLandscape ? styles.landscapeSide : (isSideA ? styles.topSide : styles.bottomSide)
+      ]}>
         {/* Attack Line (3m line) */}
-        <View style={[styles.attackLine, isTop ? { bottom: '33.3%' } : { top: '33.3%' }]} />
+        {!isLandscape ? (
+            <View style={[styles.attackLine, isSideA ? { bottom: '33.3%' } : { top: '33.3%' }]} />
+        ) : (
+            <View style={[styles.attackLineVer, isSideA ? { right: '33.3%' } : { left: '33.3%' }]} />
+        )}
         
         {players.map((player, index) => {
-          const pos = formation[index] || { left: '50%', top: '50%' };
-          // For the top side, we can just let it be top-down. 
-          // For the bottom side, the "front row" is at the top of the side (near net).
-          // Our formation top: 35% is near the top of the container.
+          let pos = formationTemplate[index] || { left: '50%', top: '50%' };
+          
+          let dynamicStyle: any = {};
+          
+          if (!isLandscape) {
+              // Portrait: distance from NET
+              dynamicStyle.left = pos.left;
+              if (isSideA) {
+                  // Net is at bottom of Side A container
+                  dynamicStyle.bottom = pos.top;
+              } else {
+                  // Net is at top of Side B container
+                  dynamicStyle.top = pos.top;
+              }
+          } else {
+              // Landscape: distance from NET
+              dynamicStyle.top = pos.top;
+              if (isSideA) {
+                  // Net is at right of Side A container
+                  dynamicStyle.right = pos.left;
+              } else {
+                  // Net is at left of Side B container
+                  dynamicStyle.left = pos.left;
+              }
+          }
+
           return (
             <View 
               key={index} 
               style={[
                 styles.playerBadge, 
-                { 
-                  backgroundColor: color, 
-                  left: pos.left as any, 
-                  top: pos.top as any 
-                }
+                dynamicStyle,
+                { backgroundColor: color }
               ]}
             >
               <Text style={styles.playerName} numberOfLines={1}>{player}</Text>
@@ -69,18 +116,30 @@ export function VolleyballCourtView({ court }: { court: Court }) {
       <Text style={[styles.courtLabel, { color: theme.text }]}>Volleyball Court {court.id}</Text>
       
       {/* Outer Padding (Blue) */}
-      <View style={styles.outerCourt}>
+      <View style={[styles.outerCourt, isLandscape && styles.outerCourtLandscape]}>
         {/* Inner Court (Orange) */}
-        <View style={styles.innerCourt}>
+        <View style={[styles.innerCourt, isLandscape && styles.innerCourtLandscape]}>
           {renderTeamSide(court.team1, TEAM_A_COLOR, true)}
           
           {/* Net Line */}
-          <View style={styles.netLineContainer}>
-             <View style={styles.netHorizontalLine} />
-             <Text style={styles.netText}>--- NET ---</Text>
-             <View style={styles.netHorizontalLine} />
-             <View style={styles.netPoleTop} />
-             <View style={styles.netPoleBottom} />
+          <View style={[styles.netLineContainer, isLandscape && styles.netLineContainerLandscape]}>
+             <View style={[isLandscape ? styles.netVerLine : styles.netHorizLine]} />
+             <Text style={[styles.netText, isLandscape && styles.netTextLandscape]}>
+                {isLandscape ? 'N\nE\nT' : '--- NET ---'}
+             </Text>
+             <View style={[isLandscape ? styles.netVerLine : styles.netHorizLine]} />
+             
+             {!isLandscape ? (
+                 <>
+                    <View style={styles.netPoleTop} />
+                    <View style={styles.netPoleBottom} />
+                 </>
+             ) : (
+                 <>
+                    <View style={styles.netPoleLeft} />
+                    <View style={styles.netPoleRight} />
+                 </>
+             )}
           </View>
 
           {renderTeamSide(court.team2, TEAM_B_COLOR, false)}
@@ -88,7 +147,7 @@ export function VolleyballCourtView({ court }: { court: Court }) {
       </View>
 
       {/* Team labels and winner selection */}
-      <View style={styles.teamLabels}>
+      <View style={[styles.teamLabels, isLandscape && styles.teamLabelsLandscape]}>
         <View style={styles.teamLabelRow}>
           <View style={[styles.teamDot, { backgroundColor: TEAM_A_COLOR }]} />
           <View style={styles.teamInfo}>
@@ -155,7 +214,7 @@ const styles = StyleSheet.create({
     maxWidth: 380,
     backgroundColor: PADDING_BLUE,
     borderRadius: 8,
-    padding: 12, // Mimics the blue border area in the image
+    padding: 12,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -164,6 +223,11 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 8,
   },
+  outerCourtLandscape: {
+    aspectRatio: 2.0,
+    width: '100%',
+    maxWidth: '100%',
+  },
   innerCourt: {
     width: '100%',
     height: '100%',
@@ -171,16 +235,31 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: LINE_WHITE,
     position: 'relative',
+    flexDirection: 'column',
+  },
+  innerCourtLandscape: {
+    flexDirection: 'row',
   },
   teamSide: {
     flex: 1,
     position: 'relative',
+  },
+  landscapeSide: {
+    flexDirection: 'row',
   },
   attackLine: {
     position: 'absolute',
     left: 0,
     right: 0,
     height: 2,
+    backgroundColor: LINE_WHITE,
+    opacity: 0.8,
+  },
+  attackLineVer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 2,
     backgroundColor: LINE_WHITE,
     opacity: 0.8,
   },
@@ -199,9 +278,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.2)',
   },
-  netHorizontalLine: {
+  netLineContainerLandscape: {
+    height: '100%',
+    width: 24,
+    flexDirection: 'column',
+  },
+  netHorizLine: {
     width: '100%',
     height: 1,
+    backgroundColor: LINE_WHITE,
+    opacity: 0.5,
+  },
+  netVerLine: {
+    height: '100%',
+    width: 1,
     backgroundColor: LINE_WHITE,
     opacity: 0.5,
   },
@@ -209,8 +299,13 @@ const styles = StyleSheet.create({
     color: LINE_WHITE,
     fontSize: 10,
     fontWeight: '900',
-    letterSpacing: 3,
+    letterSpacing: 2,
     textAlign: 'center',
+  },
+  netTextLandscape: {
+    fontSize: 8,
+    letterSpacing: 1,
+    lineHeight: 12,
   },
   netPoleTop: {
     position: 'absolute',
@@ -230,15 +325,34 @@ const styles = StyleSheet.create({
     backgroundColor: LINE_WHITE,
     borderRadius: 3,
   },
+  netPoleLeft: {
+    position: 'absolute',
+    top: -14,
+    left: 7,
+    width: 10,
+    height: 6,
+    backgroundColor: LINE_WHITE,
+    borderRadius: 3,
+  },
+  netPoleRight: {
+    position: 'absolute',
+    bottom: -14,
+    left: 7,
+    width: 10,
+    height: 6,
+    backgroundColor: LINE_WHITE,
+    borderRadius: 3,
+  },
   playerBadge: {
     position: 'absolute',
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     paddingVertical: 6,
     borderRadius: 14,
     minWidth: 80,
+    maxWidth: 100, // Added to ensure gap between players
     alignItems: 'center',
     justifyContent: 'center',
-    transform: [{ translateX: -40 }, { translateY: -12 }],
+    transform: [{ translateX: -40 }, { translateY: -12 }], // Center based on minWidth/approximate height
     zIndex: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -250,7 +364,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '800',
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
+    textAlign: 'center',
   },
   teamLabels: {
     marginTop: 20,
@@ -259,7 +374,13 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingHorizontal: 16,
   },
+  teamLabelsLandscape: {
+    maxWidth: '100%',
+    flexDirection: 'row',
+    paddingHorizontal: 0,
+  },
   teamLabelRow: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 10,

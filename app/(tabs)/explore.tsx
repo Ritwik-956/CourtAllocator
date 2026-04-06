@@ -242,9 +242,9 @@ export default function CourtsScreen() {
           {/* Phase: result */}
           {phase === 'result' && (
             <View style={styles.resultSection}>
-              <View style={isTablet && styles.courtGrid}>
+              <View style={(isTablet && selectedSport !== 'volleyball') && styles.courtGrid}>
                 {courts.map(court => (
-                  <View key={court.id} style={isTablet && styles.courtItem}>
+                  <View key={court.id} style={(isTablet && selectedSport !== 'volleyball') && styles.courtItem}>
                     {selectedSport === 'volleyball' ? (
                       <VolleyballCourtView court={court} />
                     ) : (
