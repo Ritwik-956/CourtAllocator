@@ -236,6 +236,7 @@ const styles = StyleSheet.create({
     borderColor: LINE_WHITE,
     position: 'relative',
     flexDirection: 'column',
+    overflow: 'hidden', // Prevents poles/lines from extending out
   },
   innerCourtLandscape: {
     flexDirection: 'row',
@@ -310,7 +311,7 @@ const styles = StyleSheet.create({
   netPoleTop: {
     position: 'absolute',
     top: 7,
-    left: -14,
+    left: -3,
     width: 6,
     height: 10,
     backgroundColor: LINE_WHITE,
@@ -319,7 +320,7 @@ const styles = StyleSheet.create({
   netPoleBottom: {
     position: 'absolute',
     top: 7,
-    right: -14,
+    right: -3,
     width: 6,
     height: 10,
     backgroundColor: LINE_WHITE,
@@ -327,7 +328,7 @@ const styles = StyleSheet.create({
   },
   netPoleLeft: {
     position: 'absolute',
-    top: -14,
+    top: -3,
     left: 7,
     width: 10,
     height: 6,
@@ -336,7 +337,7 @@ const styles = StyleSheet.create({
   },
   netPoleRight: {
     position: 'absolute',
-    bottom: -14,
+    bottom: -3,
     left: 7,
     width: 10,
     height: 6,
