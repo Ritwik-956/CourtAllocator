@@ -78,7 +78,7 @@ export default function PlayersScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.title, { color: theme.text }]}>FairCourt</Text>
+          <Text style={[styles.title, { color: theme.text }]}>Fair Court</Text>
           <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Manage your player pool</Text>
         </View>
 
@@ -173,11 +173,14 @@ export default function PlayersScreen() {
           renderItem={({ item }) => {
             const selected = isSelected(item);
             return (
-              <View style={[
-                styles.playerCard, 
-                { backgroundColor: theme.card, borderColor: theme.cardBorder },
-                selected && { backgroundColor: `${theme.primary}15`, borderColor: `${theme.primary}50` }
-              ]}>
+              <TouchableOpacity 
+                activeOpacity={0.7}
+                onPress={() => toggleSelect(item)}
+                style={[
+                  styles.playerCard, 
+                  { backgroundColor: theme.card, borderColor: theme.cardBorder },
+                  selected && { backgroundColor: `${theme.primary}15`, borderColor: `${theme.primary}50` }
+                ]}>
                 <View style={styles.playerInfo}>
                   <View style={[
                     styles.avatar, 
@@ -195,22 +198,24 @@ export default function PlayersScreen() {
                   </Text>
                 </View>
                 <View style={styles.actions}>
-                  <TouchableOpacity
+                  <View
                     style={[
                       styles.selectBtn, 
                       { backgroundColor: `${theme.primary}20`, borderColor: `${theme.primary}40` },
                       selected && { backgroundColor: theme.primary, borderColor: theme.primary }
-                    ]}
-                    onPress={() => toggleSelect(item)}>
+                    ]}>
                     <Text style={[styles.selectBtnText, { color: selected ? '#fff' : theme.primary }]}>{selected ? '✓' : '+'}</Text>
-                  </TouchableOpacity>
+                  </View>
                   <TouchableOpacity
                     style={[styles.deleteBtn, { backgroundColor: `${theme.danger}15`, borderColor: `${theme.danger}30` }]}
-                    onPress={() => handleDelete(item)}>
+                    onPress={(e) => {
+                      e.stopPropagation(); // Prevent card selection when deleting
+                      handleDelete(item);
+                    }}>
                     <Text style={[styles.deleteBtnText, { color: theme.danger }]}>✕</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           }}
           ListEmptyComponent={

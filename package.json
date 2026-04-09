@@ -1,10 +1,11 @@
 {
-  "name": "faircourt",
+  "name": "courtallocator",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
+    "build:android": "set EAS_BUILD_NO_EXPO_GO_WARNING=true && eas build --platform android --profile production",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",

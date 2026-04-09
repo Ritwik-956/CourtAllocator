@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "FairCourt",
-    "slug": "faircourt",
+    "name": "Fair Court",
+    "slug": "CourtAllocator",
     "version": "2.0.0",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
@@ -17,7 +17,14 @@
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "package": "com.grmpar.courtallocator"
+      "package": "com.grmpar.courtallocator",
+      "statusBar": {
+        "backgroundColor": "#00000000",
+        "translucent": true
+      },
+      "navigationBar": {
+        "backgroundColor": "#00000000"
+      }
     },
     "web": {
       "output": "static",
